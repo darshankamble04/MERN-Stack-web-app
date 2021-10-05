@@ -96,29 +96,12 @@ router.post('/login', [
 router.post('/getuser', async(req, res) => {
 
     try {
-
-        // Cheack weather the user with this email exists already 
-        let user = await User.findOne({ email })
-        if (!user) {
-            return res.status(400).json({ error: "Please enter valid credentials" });
-        }
-
-        const passCompare = await bcrypt.compare(password, user.password)
-        if (!passCompare) {
-            return res.status(400).json({ error: "Please enter valid credentials" });
-        }
-
-        const data = {
-            user: {
-                id: user.id
-            }
-        }
-        const token = jwt.sign(data, 'DarshanKamble#$@');
-        res.send(token)
-
+        userId = req.user.id;
+        const user = await User.findById(userId).select("-password")
+        res.send(user)
     } catch (error) {
-        console.error(error)
-        res.status(500).send("Internal server error!")
+        console.error(error.message);
+        res.status(500).send("Internal Server Error");
     }
 
 })
