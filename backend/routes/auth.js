@@ -1,6 +1,7 @@
 const express = require("express");
 const bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
+const fetchuser = require("../middleware/fetchuser");
 const router = express.Router();
 const User = require("../models/User")
 const { body, validationResult } = require('express-validator');
@@ -93,7 +94,7 @@ router.post('/login', [
 
 // ROUTE:3 Get loggedin user details using : POST ("./api/auth/getuser") No login required
 
-router.post('/getuser', async(req, res) => {
+router.post('/getuser', fetchuser, async(req, res) => {
 
     try {
         userId = req.user.id;
