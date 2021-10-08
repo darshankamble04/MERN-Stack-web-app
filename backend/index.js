@@ -6,6 +6,9 @@ const port = 5000;
 
 connectToMongoDB();
 
+var cors = require("cors");
+
+app.use(cors());
 // MIDDLEWARE FOR JSON :
 app.use(express.json())
 

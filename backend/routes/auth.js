@@ -83,7 +83,7 @@ router.post('/login', [
             }
         }
         const token = jwt.sign(data, 'DarshanKamble#$@');
-        res.send(token)
+        res.send({success:true,token})
 
     } catch (error) {
         console.error(error)

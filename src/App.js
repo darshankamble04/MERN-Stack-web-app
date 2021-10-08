@@ -8,6 +8,8 @@ import {
 import About from './components/About';
 import Home from './components/Home';
 import NoteState from './context/NoteState';
+import Login from './components/Login';
+import Signin from './components/Signin';
 
 function App() {
   return (
@@ -22,6 +24,12 @@ function App() {
               </Route>
               <Route exact path="/about">
                 <About />
+              </Route>
+              <Route exact path="/login">
+                <Login/>
+              </Route>
+              <Route exact path="/signin">
+                <Signin/>
               </Route>
             </Switch>
           </div>

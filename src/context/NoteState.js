@@ -1,84 +1,89 @@
-import React ,{useState} from 'react'
+import React, { useState } from 'react'
 import NoteContext from './noteContext'
 
 function NoteState(props) {
-    const initialNotes = [
-        {
-            "_id": "615d869f03747c85aa",
-            "user": "615c3ae282fc9faec0ea0475",
-            "title": "this is title 2",
-            "description": "this is description 2",
-            "__v": 0
-        },
-        {
-            "_id": "615d870533c02c7434cf07c",
-            "user": "615c3ae282fc9faec0ea0475",
-            "title": "this is title",
-            "description": "this is description",
-            "__v": 0
-        },
-        {
-            "_id": "615d8696c7cf07c855aa",
-            "user": "615c3ae282fc9faec0ea0475",
-            "title": "this is title 2",
-            "description": "this is description 2",
-            "__v": 0
-        },
-        {
-            "_id": "615d870533c02c723cf85ac",
-            "user": "615c3ae282fc9faec0ea0475",
-            "title": "this is title",
-            "description": "this is description",
-            "__v": 0
-        },
-        {
-            "_id": "615d869633c02c7cf533aa",
-            "user": "615c3ae282fc9faec0ea0475",
-            "title": "this is title 2",
-            "description": "this is description 2",
-            "__v": 0
-        },
-        {
-            "_id": "615d870533c02c7cf085aec",
-            "user": "615c3ae282fc9faec0ea0475",
-            "title": "this is title",
-            "description": "this is description",
-            "__v": 0
-        },
-        {
-            "_id": "615d87063q4f07c85sae",
-            "user": "615c3ae282fc9faec0ea0475",
-            "title": "this is title 2",
-            "description": "this is description 2",
-            "__v": 0
-        }
-    ]
+    const host = "http://localhost:5000";
+    const initialNotes = []
     const [notes, setNotes] = useState(initialNotes)
+    const [noteVal, setNoteVal] = useState({ eid: '', etitle: '', edescription: '', etag: '' })
 
-    // ADD NOTE
-    const addNote=(e)=>{
-        const {title,description,tag}= e;
-        const newNote = {
-            "_id": "615d8706fdf33c02s85sae",
-            "user": "615c3ae282fc9faec0ea0475",
-            "title": title,
-            "description":description,
-            "__v": 0
-        }
-        setNotes(notes.concat(newNote))
+    // GET NOTE :~
+    // API
+    const getNotes = async () => {
+        const response = await fetch(`${host}/api/notes/fetchallnotes`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                "auth-token": localStorage.getItem("token")
+            },
+        })
+        const json = await response.json()
+        setNotes(json)
     }
-    // DELETE NOTE
-    const deleteNote=(id)=>{
-        const updatedNotes = notes.filter((e)=>{return e._id === id})
+
+    // ADD NOTE :~
+    const addNote = async (e) => {
+        const { title, description, tag } = e;
+
+        // API
+        const response = await fetch(`${host}/api/notes/addnote`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "auth-token": localStorage.getItem("token")
+            },
+            body: JSON.stringify({ title, description, tag }),
+        })
+        const json = await response.json()
+        setNotes(notes.concat(json))
+    }
+
+    // DELETE NOTE  :~
+    const deleteNote = async (id) => {
+        // API
+        await fetch(`${host}/api/notes/deletenote/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                "auth-token": localStorage.getItem("token")
+            },
+        })
+
+        // CLIENT SIDE SCRIPTING
+        const updatedNotes = notes.filter((e) => { return e._id !== id })
         setNotes(updatedNotes)
     }
-    // EDIT NOTE
-    const editNote=()=>{
+
+    // EDIT NOTE  :~
+    const [editNoteVal, setEditNoteVal] = useState({ title: '', description: '', tag: '' })
+    const editNote = async (updatedNote) => {
+        let { eid, etitle, edescription, etag } = updatedNote
+        // CLIENT SIDE SCRIPTING
+        for (let i = 0; i < notes.length; i++) {
+            const note = notes[i];
+            if (note._id === eid) {
+                note.title = etitle;
+                note.description = edescription;
+                note.tag = etag;
+            }
+        }
+
+        setEditNoteVal({ title: etitle, description: edescription, tag: etag })
+        // API
+        await fetch(`${host}/api/notes/updatenote/${eid}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                "auth-token": localStorage.getItem("token")
+            },
+            body: JSON.stringify({ title: etitle, description: edescription, tag: etag }),
+        })
 
     }
-    
+
+
     return (
-        <NoteContext.Provider value={{notes,addNote,deleteNote,editNote}}>
+        <NoteContext.Provider value={{ notes, addNote, deleteNote, editNote, getNotes, setEditNoteVal, editNoteVal, noteVal, setNoteVal }}>
             {props.children}
         </NoteContext.Provider>
     )
