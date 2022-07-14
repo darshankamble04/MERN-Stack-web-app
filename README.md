@@ -1,1 +1,1 @@
-# iNotebook
+# iNote
